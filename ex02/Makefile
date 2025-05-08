@@ -26,7 +26,7 @@ LIBFT_MAKEFILE = make -C $(LIB_PRINTF_FOLDER)
 INCLUDES = -I$(LIB_PRINTF_FOLDER)
 
 # Define la ruta a las librerías
-libpath = -L$(LIB_PRINTF_FOLDER)
+LIBPATH = -L$(LIB_PRINTF_FOLDER)
 
 # Define las librerías a enlazar
 LIBS = -lftprintf
@@ -38,24 +38,54 @@ SRC_FOLDER = src/
 SRC_FILES = main.c \
 
 # Concatena la ruta con los nombres de archivos
+SRCS = $(addprefix $(SRC_FOLDER), $(SRC_FILES))
 
 # Genera los nombres de los archivos objeto
+OBJ_FILES = $(SRC_FILES:.c=.o)
 
 # -- RULES -- #
 # Regla principal que compila el programa y la librería printf
-# Regla patrón para compilar cada archivo .c a .o
-# Enlaza los objetos con la librería para crear el ejecutable
-# Elimina los archivos objeto y limpia printf
-# Limpieza completa: elimina objetos y ejecutable
-# Recompila todo desde cero
-# Declara reglas que no generan archivos
+all: $(NAME) printf-all
 
+# Regla patrón para compilar cada archivo .c a .o
+%.o: %.c
+	$(COMPILER) $(FLAGS) -c $< -o $@
+
+# Enlaza los objetos con la librería para crear el ejecutable
+$(NAME): $(OBJ_FILES) $(LIB_PRINTF)
+	$(COMPILER) $(FLAGS) $(INCLUDES) $(LIBPATH) $^ $(LIBS) -o $@
+
+# Elimina los archivos objeto y limpia printf
+clean: printf-clean
+	$(RM) $(OBJ_FILES)
+
+# Limpieza completa: elimina objetos y ejecutable
+fclean: printf-fclean clean
+	$(RM) $(NAME)
+
+# Recompila todo desde cero
+re: printf-re clean all
+
+# Declara reglas que no generan archivos
+run:
+	./$(NAME)
 # -- UTILS -- #
 # Ejecuta el programa
+.PHONY: all clean fclean re run
 
 # -- LIBRARIES -- #
-
 # Compila la librería printf
+printf-all:
+	$(LIBFT_MAKEFILE) all
+
 # Recompila la librería printf
+printf-re:
+	$(LIBFT_MAKEFILE) re
+
 # Limpia los objetos de printf
+printf-clean:
+	$(LIBFT_MAKEFILE) clean
+
 # Limpia completamente printf
+printf-fclean:
+	$(LIBFT_MAKEFILE) fclean
